@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -9,23 +10,41 @@ import (
 type PlayerStore interface {
 	GetPlayerScore(name string) (int, bool)
 	RecordWin(name string)
+	GetLeague() []Player
 }
 
 type PlayerServer struct {
 	store PlayerStore
+	http.Handler
 }
 
-func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func NewPlayerServer(store PlayerStore) *PlayerServer {
+	p := &PlayerServer{
+		store: store,
+	}
+	router := http.NewServeMux()
+	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
+	p.Handler = router
+	return p
+}
+
+func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+	json.NewEncoder(w).Encode(p.store.GetLeague())
+}
+
+func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 	player := r.URL.Path[len("/players/"):]
 	switch r.Method {
-	case http.MethodGet:
-		p.processScore(w, player)
 	case http.MethodPost:
 		p.processWin(w, player)
+	case http.MethodGet:
+		p.showScore(w, player)
 	}
 }
 
-func (p *PlayerServer) processScore(w http.ResponseWriter, player string) {
+func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
 	score, ok := p.store.GetPlayerScore(player)
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
@@ -41,6 +60,7 @@ func (p *PlayerServer) processWin(w http.ResponseWriter, player string) {
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
+	league   []Player
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) (int, bool) {
@@ -50,4 +70,13 @@ func (s *StubPlayerStore) GetPlayerScore(name string) (int, bool) {
 
 func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
+}
+
+func (s *StubPlayerStore) GetLeague() []Player {
+	return s.league
+}
+
+type Player struct {
+	Name string
+	Wins int
 }
