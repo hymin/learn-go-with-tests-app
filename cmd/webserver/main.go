@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"/Users/min/go/src/learn_go_with_test/http-server"
+
 	"github.com/gomodule/redigo/redis"
 )
 

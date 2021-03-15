@@ -1,4 +1,4 @@
-module main-server
+module poker
 
 go 1.13
 
