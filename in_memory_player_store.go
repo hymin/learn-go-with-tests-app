@@ -1,10 +1,5 @@
 package poker
 
-type Player struct {
-	Name string
-	Wins int
-}
-
 func NewInMemoryPlayerStore() *InMemoryPlayerStore {
 	return &InMemoryPlayerStore{map[string]int{}}
 }
