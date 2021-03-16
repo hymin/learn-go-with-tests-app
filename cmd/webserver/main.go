@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	// test
 	poker.pool = &redis.Pool{
 		MaxIdle:     10,
 		IdleTimeout: 240 * time.Second,
