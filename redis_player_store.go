@@ -3,11 +3,18 @@ package poker
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
 
-var pool *redis.Pool
+var pool = &redis.Pool{
+	MaxIdle:     10,
+	IdleTimeout: 240 * time.Second,
+	Dial: func() (redis.Conn, error) {
+		return redis.Dial("tcp", "localhost:6379")
+	},
+}
 
 func NewRedisPlayerStore(keyScore string) *RedisPlayerStore {
 	return &RedisPlayerStore{keyScore}
