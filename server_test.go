@@ -90,7 +90,6 @@ func TestStoreWins(t *testing.T) {
 
 		assertStatus(t, response.Code, http.StatusAccepted)
 	})
-
 }
 
 func TestGETPlayers(t *testing.T) {

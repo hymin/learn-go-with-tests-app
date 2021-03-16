@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"/Users/min/go/src/learn_go_with_test/http-server"
+	poker "github.com/hymin/learn-go-with-tests-app"
 
 	"github.com/gomodule/redigo/redis"
 )
 
 func main() {
-	pool = &redis.Pool{
+	poker.pool = &redis.Pool{
 		MaxIdle:     10,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
@@ -19,7 +19,7 @@ func main() {
 		},
 	}
 
-	server := NewPlayerServer(NewRedisPlayerStore("go_server_score"))
+	server := poker.NewPlayerServer(poker.NewRedisPlayerStore("go_server_score"))
 
 	if err := http.ListenAndServe(":5000", server); err != nil {
 		log.Fatalf("could not listen on port 5000 %v", err)
